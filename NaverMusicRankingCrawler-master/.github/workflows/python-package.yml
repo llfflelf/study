@@ -1,0 +1,42 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Music Crawler
+
+on:
+  schedule:
+    - cron:  '*/60 * * * *' # 주기적으로 실행하기 위한 스케줄링 - cron 설정
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version:  '3.x'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run Crawler py
+      run: |
+        python "MusicCrawler.py"
+        
+    - name: Commit
+      run: |
+        git config --local user.email "kisun66@naver.com"
+        git config --local user.name "kisun66" # 커밋에 포함될 이름
+        git add musicRank.json
+        git commit -m "Auto - Update data with Crawling" # 커밋 메세지
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: 'master'
+        github_token: $
